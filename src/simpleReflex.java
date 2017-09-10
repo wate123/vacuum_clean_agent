@@ -2,6 +2,7 @@
  * For Question 1A
  * Random initial Location and Status. No state.
  */
+import java.util.ArrayList;
 import java.util.Random;
 public class simpleReflex {
 
@@ -9,6 +10,7 @@ public class simpleReflex {
     private static char current_location;
     private static int score = 0;
     private static double step = 100;
+    private static String[] state;
     public static String run1aVacuum(){
             if (current_location == 'A'){
                 score -= 3;
@@ -38,39 +40,54 @@ public class simpleReflex {
                 return "[B , right] ";
             }
     }
-    public static String run1bVacuum(){
-        String[] state = {null,null,null};
-        if (current_location == 'A'){
-            score -= 3;
-            step --;
-            current_location = 'B';
-            if(isDirty[0].equals("Dirty")){
-                score += 10;
-                System.out.print("[A , suck] ");
-            }
-            return "[A , right] ";
+    public static void run1bVacuum(){
+        state = isDirty;
+        ArrayList output = new ArrayList();
+        for (int i = 0; i < 100; i++) {
+            if(state[0].equals("Clean") && state[0].equals(state[1]) && state[1].equals(state[2]) && state[2].equals(state[0])){
+                System.out.print("[NoOp] ");
+                break;
+            }else if (current_location == 'A'){
+                score -= 3;
+                step --;
 
-        }else if (current_location == 'C'){
-            score -= 3;
-            step --;
-            current_location = 'B';
-            if(isDirty[2].equals("Dirty")){
-                score += 10;
-                System.out.print("[C , suck] ");
-            }
-            return "[C , left] ";
+                if(state[0].equals("Dirty")){
+                    score += 10;
+                    state[0] = "Clean";
+                    output.add("[A , suck] ");
+                }
+                System.out.print("[A , right] ");
+                current_location = 'B';
 
-        }else {
-            score -= 3;
-            step --;
-            current_location = 'C';
-            if(isDirty[1].equals("Dirty")){
-                score += 10;
-                System.out.print("[B , suck] ");
+            }else if (current_location == 'C'){
+                score -= 3;
+                step --;
+                current_location = 'B';
+                if(state[2].equals("Dirty")){
+                    score += 10;
+                    state[2] = "Clean";
+                    System.out.print("[C , suck] ");
+                }
+                System.out.print("[C , left] ");
+
+            }else {
+                score -= 3;
+                step --;
+                if(state[1].equals("Dirty")){
+                    score += 10;
+                    state[1] = "Clean";
+                    System.out.print("[B , suck] ");
+                }
+                if(state[0].equals("Clean")){
+                    current_location = 'C';
+                    System.out.print("[B , right] ");
+                }else {
+                    current_location = 'A';
+                    System.out.print("[B , left] ");
+                }
+
             }
-            return "[B , right] ";
         }
-
     }
 
     private static int generateRandom(int min, int max) {
@@ -113,9 +130,18 @@ public class simpleReflex {
                 System.out.println();
             }else {
                 System.out.print(run1aVacuum());
+
             }
         }
-        System.out.printf("Performance Score: %.2f", score/step);
+        System.out.printf("Performance Score: %.2f\n", score/step);
+        System.out.println();
+        for (int i = 0; i <isDirty.length ; i++) {
+            char[] abc = {'A','B','C'};
+            System.out.printf("Location: %s Status = %s\n",abc[i],isDirty[i]);
+        }
+        run1bVacuum();
+        System.out.println();
+        System.out.printf("Performance Score: %.2f\n", score/step);
     }
 
 }
